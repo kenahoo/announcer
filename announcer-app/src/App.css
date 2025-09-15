@@ -77,7 +77,7 @@ body {
 .roster-table td {
   padding: 4px 8px;
   text-align: left;
-  min-width: 90px;
+  min-width: 70px;
 }
 
 .roster-table th {
@@ -100,4 +100,9 @@ body {
 .team-header {
   gap: 24px;
   margin-bottom: 8px;
+}
+
+.roster-table th:last-child,
+.roster-table td:last-child {
+  min-width: 170px;
 }
