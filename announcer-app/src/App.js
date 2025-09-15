@@ -48,7 +48,7 @@ const initialOpponentRoster = [
   { number: 20, firstName: 'Tom', lastName: 'Collins', position: 'FW', scores: '' }
 ];
 
-function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handleScoreChange }) {
+function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer }) {
   return (
     <div className="roster">
       <div className="team-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', gap: '32px' }}>
@@ -57,16 +57,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
           value={teamName}
           onChange={onTeamNameChange}
           className="team-name-input"
-          style={{
-            fontSize: '1.5em',
-            fontWeight: 'bold',
-            textAlign: 'center',
-            flex: 1,
-            minWidth: '120px',
-            border: 'none',
-            background: 'transparent',
-            color: '#222'
-          }}
+          style={{ fontSize: '1.5em', fontWeight: 'bold', textAlign: 'center', flex: 1, minWidth: '120px', border: 'none', background: 'transparent', color: '#222' }}
           placeholder="Team Name"
         />
         <input
@@ -75,17 +66,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
           onChange={onScoreChange}
           className="team-score-input"
           min={0}
-          style={{
-            fontSize: '2.5em',
-            fontWeight: 'bold',
-            width: '110px',
-            textAlign: 'center',
-            borderRadius: '8px',
-            border: '2px solid #888',
-            background: '#fff',
-            color: '#222',
-            margin: '0 16px',
-          }}
+          style={{ fontSize: '2.5em', fontWeight: 'bold', width: '110px', textAlign: 'center', borderRadius: '8px', border: '2px solid #888', background: '#fff', color: '#222', margin: '0 16px' }}
           aria-label="Team Score"
         />
       </div>
@@ -97,44 +78,87 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
             <th>Last Name</th>
             <th>Position</th>
             <th>Notes</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {players.sort((a, b) => a.number - b.number).map((player, idx) => (
             <tr
               key={player.number}
-              style={{
-                backgroundColor: status[player.number] ? 'green' : '#872d2d', // softer red
-                color: 'white',
-                cursor: 'pointer'
-              }}
+              style={{ backgroundColor: status[player.number] ? 'green' : '#c88', color: 'white', cursor: 'pointer' }}
               onClick={e => {
-                if (e.target.tagName !== 'INPUT') toggleStatus(player.number);
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleStatus(player.number);
               }}
             >
-              <td>{player.number}</td>
-              <td>{player.firstName}</td>
-              <td>{player.lastName}</td>
-              <td>{player.position}</td>
+              <td>
+                <input
+                  type="number"
+                  value={player.number}
+                  onChange={e => handlePlayerChange(idx, 'number', e.target.value)}
+                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={player.firstName}
+                  onChange={e => handlePlayerChange(idx, 'firstName', e.target.value)}
+                  style={{ width: '100%', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px' }}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={player.lastName}
+                  onChange={e => handlePlayerChange(idx, 'lastName', e.target.value)}
+                  style={{ width: '100%', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px' }}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={player.position}
+                  onChange={e => handlePlayerChange(idx, 'position', e.target.value)}
+                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
+                />
+              </td>
               <td>
                 <input
                   type="text"
                   value={player.scores}
-                  onChange={e => handleScoreChange(idx, e.target.value)}
-                  style={{ width: '100%', color: 'black', background: 'white', borderRadius: '4px', border: '1px solid #ccc', padding: '2px 6px' }}
+                  onChange={e => handlePlayerChange(idx, 'scores', e.target.value)}
+                  style={{ width: '100%', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 6px' }}
                   onClick={e => e.stopPropagation()}
                 />
+              </td>
+              <td>
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); handleRemovePlayer(idx); }}
+                  style={{ background: 'transparent', color: '#fff', border: 'none', borderRadius: '0', padding: '2px 8px', cursor: 'pointer', fontWeight: 'bold' }}
+                  aria-label="Remove Player"
+                >
+                  ×
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <div style={{ textAlign: 'right', marginTop: '8px' }}>
+        <button
+          type="button"
+          onClick={handleAddPlayer}
+          style={{ background: '#eaeaea', color: '#222', border: '1px solid #ccc', borderRadius: '4px', padding: '4px 12px', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          Add Player
+        </button>
+      </div>
     </div>
   );
 }
 
 function App() {
-  // Track status: true = on field (green), false = bench (red)
   const [homeStatus, setHomeStatus] = useState({});
   const [opponentStatus, setOpponentStatus] = useState({});
   const [homeRoster, setHomeRoster] = useState(initialHomeRoster);
@@ -151,18 +175,39 @@ function App() {
     setOpponentStatus(prev => ({ ...prev, [num]: !prev[num] }));
   };
 
-  const handleHomeScoreChange = (idx, value) => {
+  // Generalized player change handler
+  const handleHomePlayerChange = (idx, field, value) => {
     setHomeRoster(prev => {
       const updated = [...prev];
-      updated[idx] = { ...updated[idx], scores: value };
+      updated[idx] = { ...updated[idx], [field]: field === 'number' ? Number(value) : value };
       return updated;
     });
   };
-  const handleOpponentScoreChange = (idx, value) => {
+  const handleOpponentPlayerChange = (idx, field, value) => {
     setOpponentRoster(prev => {
       const updated = [...prev];
+      updated[idx] = { ...updated[idx], [field]: field === 'number' ? Number(value) : value };
       updated[idx] = { ...updated[idx], scores: value };
-      return updated;
+    });
+  };
+  // Remove player
+  const handleRemoveHomePlayer = (idx) => {
+    setHomeRoster(prev => prev.filter((_, i) => i !== idx));
+  };
+  const handleRemoveOpponentPlayer = (idx) => {
+    setOpponentRoster(prev => prev.filter((_, i) => i !== idx));
+  };
+  // Add player
+  const handleAddHomePlayer = () => {
+    setHomeRoster(prev => {
+      const nextNumber = prev.length > 0 ? Math.max(...prev.map(p => p.number)) + 1 : 1;
+      return [...prev, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '' }];
+    });
+  };
+  const handleAddOpponentPlayer = () => {
+    setOpponentRoster(prev => {
+      const nextNumber = prev.length > 0 ? Math.max(...prev.map(p => p.number)) + 1 : 1;
+      return [...prev, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '' }];
     });
   };
 
@@ -176,8 +221,9 @@ function App() {
         players={homeRoster}
         status={homeStatus}
         toggleStatus={toggleHomeStatus}
-        handleScoreChange={handleHomeScoreChange}
-        isHome={true}
+        handlePlayerChange={handleHomePlayerChange}
+        handleRemovePlayer={handleRemoveHomePlayer}
+        handleAddPlayer={handleAddHomePlayer}
       />
       <Roster
         teamName={opponentTeamName}
@@ -187,8 +233,9 @@ function App() {
         players={opponentRoster}
         status={opponentStatus}
         toggleStatus={toggleOpponentStatus}
-        handleScoreChange={handleOpponentScoreChange}
-        isHome={false}
+        handlePlayerChange={handleOpponentPlayerChange}
+        handleRemovePlayer={handleRemoveOpponentPlayer}
+        handleAddPlayer={handleAddOpponentPlayer}
       />
     </div>
   );
