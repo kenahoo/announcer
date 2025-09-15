@@ -73,23 +73,33 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
       <table className="roster-table">
         <thead>
           <tr>
+            <th></th>
             <th>Number</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Position</th>
             <th>Notes</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
           {players.sort((a, b) => a.number - b.number).map((player, idx) => (
             <tr
               key={player.number}
-              style={{ backgroundColor: status[player.number] ? 'green' : '#c88', color: 'white', cursor: 'pointer' }}
+              style={{ backgroundColor: status[player.number] ? '#8c8' : '#c88', color: 'white', cursor: 'pointer' }}
               onClick={e => {
                 if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleStatus(player.number);
               }}
             >
+              <td>
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); handleRemovePlayer(idx); }}
+                  style={{ background: 'transparent', color: '#fff', border: 'none', borderRadius: '0', padding: '2px 8px', cursor: 'pointer', fontWeight: 'bold' }}
+                  aria-label="Remove Player"
+                >
+                  ×
+                </button>
+              </td>
               <td>
                 <input
                   type="number"
@@ -130,16 +140,6 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                   style={{ width: '100%', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 6px' }}
                   onClick={e => e.stopPropagation()}
                 />
-              </td>
-              <td>
-                <button
-                  type="button"
-                  onClick={e => { e.stopPropagation(); handleRemovePlayer(idx); }}
-                  style={{ background: 'transparent', color: '#fff', border: 'none', borderRadius: '0', padding: '2px 8px', cursor: 'pointer', fontWeight: 'bold' }}
-                  aria-label="Remove Player"
-                >
-                  ×
-                </button>
               </td>
             </tr>
           ))}
