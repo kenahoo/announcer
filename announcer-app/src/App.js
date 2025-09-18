@@ -267,7 +267,15 @@ function App() {
             setHomeRoster(imported);
           } else {
             alert('Invalid CSV format.');
-          }
+            // Find which columns are missing
+            const missingColumns = [];
+            if (!results.meta.fields.includes('number')) missingColumns.push('number');
+            if (!results.meta.fields.includes('firstName')) missingColumns.push('firstName');
+            if (!results.meta.fields.includes('lastName')) missingColumns.push('lastName');
+            if (!results.meta.fields.includes('grade')) missingColumns.push('grade');
+            if (!results.meta.fields.includes('position')) missingColumns.push('position');
+            // Show a more helpful error message
+            alert('Invalid CSV format. Missing columns: ' + (missingColumns.length ? missingColumns.join(', ') : 'Check for empty values in required columns.'));
         } catch {
           alert('Failed to import CSV.');
         }
@@ -298,7 +306,15 @@ function App() {
           } else {
             alert('Invalid CSV format.');
           }
-        } catch {
+            // Find which columns are missing
+            const missingColumns = [];
+            if (!results.meta.fields.includes('number')) missingColumns.push('number');
+            if (!results.meta.fields.includes('firstName')) missingColumns.push('firstName');
+            if (!results.meta.fields.includes('lastName')) missingColumns.push('lastName');
+            if (!results.meta.fields.includes('grade')) missingColumns.push('grade');
+            if (!results.meta.fields.includes('position')) missingColumns.push('position');
+            // Show a more helpful error message
+            alert('Invalid CSV format. Missing columns: ' + (missingColumns.length ? missingColumns.join(', ') : 'Check for empty values in required columns.'));
           alert('Failed to import CSV.');
         }
       }
