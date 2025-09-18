@@ -245,8 +245,8 @@ function App() {
       return [...prev, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false }];
     });
   };
-  // CSV import handler for home roster
-  const handleImportHomeCSV = (e) => {
+  // Unified CSV import handler
+  const handleImportCSV = (setRoster) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
     Papa.parse(file, {
@@ -258,15 +258,15 @@ function App() {
             number: Number(row.number),
             firstName: row.firstName || '',
             lastName: row.lastName || '',
+            grade: row.grade || '',
             position: row.position || '',
             scores: row.scores || '',
             yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
             redCard: row.redCard === 'true' || row.redCard === '1',
           }));
           if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
-            setHomeRoster(imported);
+            setRoster(imported);
           } else {
-            alert('Invalid CSV format.');
             // Find which columns are missing
             const missingColumns = [];
             if (!results.meta.fields.includes('number')) missingColumns.push('number');
@@ -276,45 +276,8 @@ function App() {
             if (!results.meta.fields.includes('position')) missingColumns.push('position');
             // Show a more helpful error message
             alert('Invalid CSV format. Missing columns: ' + (missingColumns.length ? missingColumns.join(', ') : 'Check for empty values in required columns.'));
-        } catch {
-          alert('Failed to import CSV.');
-        }
-      }
-    });
-    e.target.value = '';
-  };
-  // CSV import handler for opponent roster
-  const handleImportOpponentCSV = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        try {
-          const imported = results.data.map(row => ({
-            number: Number(row.number),
-            firstName: row.firstName || '',
-            lastName: row.lastName || '',
-            position: row.position || '',
-            scores: row.scores || '',
-            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
-            redCard: row.redCard === 'true' || row.redCard === '1'
-          }));
-          if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
-            setOpponentRoster(imported);
-          } else {
-            alert('Invalid CSV format.');
           }
-            // Find which columns are missing
-            const missingColumns = [];
-            if (!results.meta.fields.includes('number')) missingColumns.push('number');
-            if (!results.meta.fields.includes('firstName')) missingColumns.push('firstName');
-            if (!results.meta.fields.includes('lastName')) missingColumns.push('lastName');
-            if (!results.meta.fields.includes('grade')) missingColumns.push('grade');
-            if (!results.meta.fields.includes('position')) missingColumns.push('position');
-            // Show a more helpful error message
-            alert('Invalid CSV format. Missing columns: ' + (missingColumns.length ? missingColumns.join(', ') : 'Check for empty values in required columns.'));
+        } catch {
           alert('Failed to import CSV.');
         }
       }
@@ -335,7 +298,7 @@ function App() {
         handlePlayerChange={handleHomePlayerChange}
         handleRemovePlayer={handleRemoveHomePlayer}
         handleAddPlayer={handleAddHomePlayer}
-        handleImportCSV={handleImportHomeCSV}
+        handleImportCSV={handleImportCSV(setHomeRoster)}
       />
       <Roster
         teamName={opponentTeamName}
@@ -348,7 +311,7 @@ function App() {
         handlePlayerChange={handleOpponentPlayerChange}
         handleRemovePlayer={handleRemoveOpponentPlayer}
         handleAddPlayer={handleAddOpponentPlayer}
-        handleImportCSV={handleImportOpponentCSV}
+        handleImportCSV={handleImportCSV(setOpponentRoster)}
       />
     </div>
   );
