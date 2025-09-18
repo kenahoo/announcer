@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import Papa from 'papaparse';
 
 // Initial roster data
 const initialHomeRoster = [
@@ -48,7 +49,7 @@ const initialOpponentRoster = [
   { number: 20, firstName: 'Tom', lastName: 'Collins', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
-function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer }) {
+function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV }) {
   // Card toggle handlers
   const handleToggleCard = (idx, cardType) => {
     handlePlayerChange(idx, cardType, !players[idx][cardType]);
@@ -56,6 +57,12 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
 
   return (
     <div className="roster">
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px', gap: '8px' }}>
+        <label style={{ padding: '4px 10px', fontSize: '0.9em', cursor: 'pointer', background: '#eaeaea', borderRadius: '4px', border: '1px solid #ccc' }}>
+          Import CSV
+          <input type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={handleImportCSV} />
+        </label>
+      </div>
       <div className="team-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', gap: '32px' }}>
         <input
           type="text"
@@ -229,6 +236,66 @@ function App() {
       return [...prev, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false }];
     });
   };
+  // CSV import handler for home roster
+  const handleImportHomeCSV = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        try {
+          const imported = results.data.map(row => ({
+            number: Number(row.number),
+            firstName: row.firstName || '',
+            lastName: row.lastName || '',
+            position: row.position || '',
+            scores: row.scores || '',
+            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1' ? true : false,
+            redCard: row.redCard === 'true' || row.redCard === '1' ? true : false
+          }));
+          if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
+            setHomeRoster(imported);
+          } else {
+            alert('Invalid CSV format.');
+          }
+        } catch {
+          alert('Failed to import CSV.');
+        }
+      }
+    });
+    e.target.value = '';
+  };
+  // CSV import handler for opponent roster
+  const handleImportOpponentCSV = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        try {
+          const imported = results.data.map(row => ({
+            number: Number(row.number),
+            firstName: row.firstName || '',
+            lastName: row.lastName || '',
+            position: row.position || '',
+            scores: row.scores || '',
+            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1' ? true : false,
+            redCard: row.redCard === 'true' || row.redCard === '1' ? true : false
+          }));
+          if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
+            setOpponentRoster(imported);
+          } else {
+            alert('Invalid CSV format.');
+          }
+        } catch {
+          alert('Failed to import CSV.');
+        }
+      }
+    });
+    e.target.value = '';
+  };
 
   return (
     <div className="App" style={{ display: 'flex', justifyContent: 'space-around', padding: '32px' }}>
@@ -243,6 +310,7 @@ function App() {
         handlePlayerChange={handleHomePlayerChange}
         handleRemovePlayer={handleRemoveHomePlayer}
         handleAddPlayer={handleAddHomePlayer}
+        handleImportCSV={handleImportHomeCSV}
       />
       <Roster
         teamName={opponentTeamName}
@@ -255,6 +323,7 @@ function App() {
         handlePlayerChange={handleOpponentPlayerChange}
         handleRemovePlayer={handleRemoveOpponentPlayer}
         handleAddPlayer={handleAddOpponentPlayer}
+        handleImportCSV={handleImportOpponentCSV}
       />
     </div>
   );
