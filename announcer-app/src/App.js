@@ -4,49 +4,49 @@ import Papa from 'papaparse';
 
 // Initial roster data
 const initialHomeRoster = [
-  { number: 1, firstName: 'Alice', lastName: 'Smith', position: 'GK', scores: '', yellowCard: false, redCard: false },
-  { number: 2, firstName: 'Beth', lastName: 'Johnson', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 3, firstName: 'Cara', lastName: 'Williams', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 4, firstName: 'Dana', lastName: 'Brown', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 5, firstName: 'Eva', lastName: 'Jones', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 6, firstName: 'Fay', lastName: 'Miller', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 7, firstName: 'Gina', lastName: 'Wilson', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 8, firstName: 'Holly', lastName: 'Moore', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 9, firstName: 'Ivy', lastName: 'Taylor', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 10, firstName: 'Jade', lastName: 'Anderson', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 11, firstName: 'Kate', lastName: 'Thomas', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 12, firstName: 'Lara', lastName: 'Jackson', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 13, firstName: 'Mia', lastName: 'White', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 14, firstName: 'Nina', lastName: 'Harris', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 15, firstName: 'Olga', lastName: 'Martin', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 16, firstName: 'Paula', lastName: 'Thompson', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 17, firstName: 'Quinn', lastName: 'Garcia', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 18, firstName: 'Rita', lastName: 'Martinez', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 19, firstName: 'Sara', lastName: 'Robinson', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 20, firstName: 'Tina', lastName: 'Clark', position: 'FW', scores: '', yellowCard: false, redCard: false }
+  { number: 1, firstName: 'Alice', lastName: 'Smith', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
+  { number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 4, firstName: 'Dana', lastName: 'Brown', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 5, firstName: 'Eva', lastName: 'Jones', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 6, firstName: 'Fay', lastName: 'Miller', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 7, firstName: 'Gina', lastName: 'Wilson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 8, firstName: 'Holly', lastName: 'Moore', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 9, firstName: 'Ivy', lastName: 'Taylor', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 10, firstName: 'Jade', lastName: 'Anderson', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 11, firstName: 'Kate', lastName: 'Thomas', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 12, firstName: 'Lara', lastName: 'Jackson', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 13, firstName: 'Mia', lastName: 'White', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 14, firstName: 'Nina', lastName: 'Harris', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 15, firstName: 'Olga', lastName: 'Martin', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 16, firstName: 'Paula', lastName: 'Thompson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 17, firstName: 'Quinn', lastName: 'Garcia', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 18, firstName: 'Rita', lastName: 'Martinez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 19, firstName: 'Sara', lastName: 'Robinson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 20, firstName: 'Tina', lastName: 'Clark', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
 const initialOpponentRoster = [
-  { number: 1, firstName: 'Aaron', lastName: 'King', position: 'GK', scores: '', yellowCard: false, redCard: false },
-  { number: 2, firstName: 'Ben', lastName: 'Wright', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 3, firstName: 'Caleb', lastName: 'Lopez', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 4, firstName: 'Dylan', lastName: 'Hill', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 5, firstName: 'Eli', lastName: 'Scott', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 6, firstName: 'Finn', lastName: 'Green', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 7, firstName: 'Gabe', lastName: 'Adams', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 8, firstName: 'Henry', lastName: 'Nelson', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 9, firstName: 'Isaac', lastName: 'Baker', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 10, firstName: 'Jack', lastName: 'Carter', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 11, firstName: 'Kyle', lastName: 'Mitchell', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 12, firstName: 'Liam', lastName: 'Perez', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 13, firstName: 'Mason', lastName: 'Roberts', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 14, firstName: 'Noah', lastName: 'Turner', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 15, firstName: 'Owen', lastName: 'Phillips', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 16, firstName: 'Paul', lastName: 'Campbell', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 17, firstName: 'Quentin', lastName: 'Parker', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 18, firstName: 'Ryan', lastName: 'Evans', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 19, firstName: 'Sam', lastName: 'Edwards', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 20, firstName: 'Tom', lastName: 'Collins', position: 'FW', scores: '', yellowCard: false, redCard: false }
+  { number: 1, firstName: 'Aaron', lastName: 'King', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
+  { number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 4, firstName: 'Dylan', lastName: 'Hill', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 5, firstName: 'Eli', lastName: 'Scott', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 6, firstName: 'Finn', lastName: 'Green', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 7, firstName: 'Gabe', lastName: 'Adams', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 8, firstName: 'Henry', lastName: 'Nelson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 9, firstName: 'Isaac', lastName: 'Baker', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 10, firstName: 'Jack', lastName: 'Carter', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 11, firstName: 'Kyle', lastName: 'Mitchell', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 12, firstName: 'Liam', lastName: 'Perez', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 13, firstName: 'Mason', lastName: 'Roberts', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 14, firstName: 'Noah', lastName: 'Turner', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 15, firstName: 'Owen', lastName: 'Phillips', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 16, firstName: 'Paul', lastName: 'Campbell', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 17, firstName: 'Quentin', lastName: 'Parker', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
+  { number: 18, firstName: 'Ryan', lastName: 'Evans', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { number: 19, firstName: 'Sam', lastName: 'Edwards', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
+  { number: 20, firstName: 'Tom', lastName: 'Collins', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
 function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV }) {
@@ -89,6 +89,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
             <th>Number</th>
             <th>First Name</th>
             <th>Last Name</th>
+            <th>Grade</th>
             <th>Position</th>
             <th>Notes</th>
           </tr>
@@ -148,6 +149,14 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                   value={player.lastName}
                   onChange={e => handlePlayerChange(idx, 'lastName', e.target.value)}
                   style={{ width: '100%', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px' }}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={player.grade || ''}
+                  onChange={e => handlePlayerChange(idx, 'grade', e.target.value)}
+                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
                 />
               </td>
               <td>
@@ -251,8 +260,8 @@ function App() {
             lastName: row.lastName || '',
             position: row.position || '',
             scores: row.scores || '',
-            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1' ? true : false,
-            redCard: row.redCard === 'true' || row.redCard === '1' ? true : false
+            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
+            redCard: row.redCard === 'true' || row.redCard === '1',
           }));
           if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
             setHomeRoster(imported);
@@ -281,8 +290,8 @@ function App() {
             lastName: row.lastName || '',
             position: row.position || '',
             scores: row.scores || '',
-            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1' ? true : false,
-            redCard: row.redCard === 'true' || row.redCard === '1' ? true : false
+            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
+            redCard: row.redCard === 'true' || row.redCard === '1'
           }));
           if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
             setOpponentRoster(imported);
