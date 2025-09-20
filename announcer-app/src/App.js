@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 import Papa from 'papaparse';
 
@@ -48,6 +48,46 @@ const initialOpponentRoster = [
   { number: 19, firstName: 'Sam', lastName: 'Edwards', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
   { number: 20, firstName: 'Tom', lastName: 'Collins', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
+
+function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }) {
+  const spanRef = useRef(null);
+  const inputRef = useRef(null);
+  const [inputWidth, setInputWidth] = useState(20);
+
+  useEffect(() => {
+    if (spanRef.current) {
+      setInputWidth(spanRef.current.offsetWidth + 8); // add some padding
+    }
+  }, [value]);
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type={type}
+        value={value}
+        onChange={onChange}
+        style={{ ...style, width: inputWidth, minWidth: 20, maxWidth: 400, boxSizing: 'content-box' }}
+        {...props}
+      />
+      <span
+        ref={spanRef}
+        style={{
+          position: 'absolute',
+          visibility: 'hidden',
+          height: 0,
+          overflow: 'hidden',
+          whiteSpace: 'pre',
+          fontSize: style.fontSize || 'inherit',
+          fontFamily: style.fontFamily || 'inherit',
+          fontWeight: style.fontWeight || 'inherit',
+          padding: style.padding || '2px 4px',
+          border: style.border || 'none',
+        }}
+      >{value || ''}</span>
+    </>
+  );
+}
 
 function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV }) {
   // Card toggle handlers
@@ -103,11 +143,11 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleStatus(player.number);
               }}
             >
-              <td style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <td style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>&nbsp;&nbsp;
                 <button
                   type="button"
                   onClick={e => { e.stopPropagation(); handleRemovePlayer(idx); }}
-                  style={{ background: 'transparent', color: '#fff', border: '1px solid #000', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold' }}
+                  style={{ background: 'transparent', color: '#fff', border: '1px solid #000', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold', marginLeft: '4px' }}
                   aria-label="Remove Player"
                 >×</button>
                 <button
@@ -128,7 +168,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 </button>
               </td>
               <td>
-                <input
+                <AutoWidthInput
                   type="number"
                   value={player.number}
                   onChange={e => handlePlayerChange(idx, 'number', e.target.value)}
@@ -136,7 +176,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 />
               </td>
               <td>
-                <input
+                <AutoWidthInput
                   type="text"
                   value={player.firstName}
                   onChange={e => handlePlayerChange(idx, 'firstName', e.target.value)}
@@ -144,7 +184,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 />
               </td>
               <td>
-                <input
+                <AutoWidthInput
                   type="text"
                   value={player.lastName}
                   onChange={e => handlePlayerChange(idx, 'lastName', e.target.value)}
@@ -152,7 +192,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 />
               </td>
               <td>
-                <input
+                <AutoWidthInput
                   type="text"
                   value={player.grade || ''}
                   onChange={e => handlePlayerChange(idx, 'grade', e.target.value)}
@@ -160,7 +200,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 />
               </td>
               <td>
-                <input
+                <AutoWidthInput
                   type="text"
                   value={player.position}
                   onChange={e => handlePlayerChange(idx, 'position', e.target.value)}
@@ -168,7 +208,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
                 />
               </td>
               <td>
-                <input
+                <AutoWidthInput
                   type="text"
                   value={player.scores}
                   onChange={e => handlePlayerChange(idx, 'scores', e.target.value)}

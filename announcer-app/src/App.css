@@ -65,7 +65,7 @@ body {
 }
 
 .roster li {
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .roster-table {
@@ -75,7 +75,7 @@ body {
 
 .roster-table th,
 .roster-table td {
-  padding: 4px 8px;
+  padding: 2px 2px;
   text-align: left;
   min-width: 70px;
 }
@@ -90,7 +90,7 @@ body {
 
 .roster-table tr {
   transition: background 0.2s;
-  height: 32px;
+  height: 20px;
 }
 
 .roster-table tr:hover {
