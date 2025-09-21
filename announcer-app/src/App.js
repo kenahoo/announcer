@@ -138,7 +138,8 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
           {players.sort((a, b) => a.number - b.number).map((player, idx) => (
             <tr
               key={player.number}
-              style={{ backgroundColor: status[player.number] ? '#8c8' : '#c88', color: 'white', cursor: 'pointer' }}
+              className={status[player.number] ? 'player-active' : 'player-inactive'}
+              style={{ cursor: 'pointer' }}
               onClick={e => {
                 if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleStatus(player.number);
               }}

@@ -39,7 +39,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  background: #ffffff;
 }
 
 .App {
@@ -105,4 +105,13 @@ body {
 .roster-table th:last-child,
 .roster-table td:last-child {
   min-width: 170px;
+}
+
+.player-active {
+  background-color: #8c8;
+  color: white;
+}
+.player-inactive {
+  background-color: #c88;
+  color: white;
 }
