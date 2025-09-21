@@ -234,15 +234,41 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
   );
 }
 
+function getLocalStorage(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setLocalStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+}
+
 function App() {
-  const [homeStatus, setHomeStatus] = useState({});
-  const [opponentStatus, setOpponentStatus] = useState({});
-  const [homeRoster, setHomeRoster] = useState(initialHomeRoster);
-  const [opponentRoster, setOpponentRoster] = useState(initialOpponentRoster);
-  const [homeTeamName, setHomeTeamName] = useState('Home Team');
-  const [opponentTeamName, setOpponentTeamName] = useState('Opponent');
-  const [homeScore, setHomeScore] = useState(0);
-  const [opponentScore, setOpponentScore] = useState(0);
+  // Load from localStorage or fallback to initial values
+  const [homeStatus, setHomeStatus] = useState(() => getLocalStorage('homeStatus', {}));
+  const [opponentStatus, setOpponentStatus] = useState(() => getLocalStorage('opponentStatus', {}));
+  const [homeRoster, setHomeRoster] = useState(() => getLocalStorage('homeRoster', initialHomeRoster));
+  const [opponentRoster, setOpponentRoster] = useState(() => getLocalStorage('opponentRoster', initialOpponentRoster));
+  const [homeTeamName, setHomeTeamName] = useState(() => getLocalStorage('homeTeamName', 'Home Team'));
+  const [opponentTeamName, setOpponentTeamName] = useState(() => getLocalStorage('opponentTeamName', 'Opponent'));
+  const [homeScore, setHomeScore] = useState(() => getLocalStorage('homeScore', 0));
+  const [opponentScore, setOpponentScore] = useState(() => getLocalStorage('opponentScore', 0));
+
+  // Persist changes to localStorage
+  useEffect(() => { setLocalStorage('homeRoster', homeRoster); }, [homeRoster]);
+  useEffect(() => { setLocalStorage('opponentRoster', opponentRoster); }, [opponentRoster]);
+  useEffect(() => { setLocalStorage('homeTeamName', homeTeamName); }, [homeTeamName]);
+  useEffect(() => { setLocalStorage('opponentTeamName', opponentTeamName); }, [opponentTeamName]);
+  useEffect(() => { setLocalStorage('homeScore', homeScore); }, [homeScore]);
+  useEffect(() => { setLocalStorage('opponentScore', opponentScore); }, [opponentScore]);
+  useEffect(() => { setLocalStorage('homeStatus', homeStatus); }, [homeStatus]);
+  useEffect(() => { setLocalStorage('opponentStatus', opponentStatus); }, [opponentStatus]);
 
   const toggleHomeStatus = (num) => {
     setHomeStatus(prev => ({ ...prev, [num]: !prev[num] }));
