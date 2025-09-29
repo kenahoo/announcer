@@ -130,12 +130,6 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
 
   return (
     <div className="roster">
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px', gap: '8px' }}>
-        <label style={{ padding: '4px 10px', fontSize: '0.9em', cursor: 'pointer', background: '#eaeaea', borderRadius: '4px', border: '1px solid #ccc' }}>
-          Import CSV
-          <input type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={handleImportCSV} />
-        </label>
-      </div>
       <div className="team-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', gap: '32px' }}>
         <input
           type="text"
@@ -258,13 +252,27 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
         <span style={{ fontSize: '0.95em', color: '#222', fontWeight: 500 }}>
           Active players: {activeCount}
         </span>
-        <button
-          type="button"
-          onClick={handleAddPlayer}
-          style={{ background: '#eaeaea', color: '#222', border: '1px solid #ccc', borderRadius: '4px', padding: '4px 12px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          Add Player
-        </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            style={{ display: 'none' }}
+            id="csv-import-input"
+            onChange={handleImportCSV}
+          />
+          <button
+            onClick={() => document.getElementById('csv-import-input')?.click()}
+            style={{ cursor: 'pointer'}}
+          >
+            Import CSV
+          </button>
+          <button
+            onClick={handleAddPlayer}
+            style={{ cursor: 'pointer'}}
+          >
+            Add Player
+          </button>
+        </div>
       </div>
     </div>
   );
