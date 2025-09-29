@@ -2,8 +2,38 @@ import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 import Papa from 'papaparse';
 
-// Initial roster data
-const initialHomeRoster = [
+// TypeScript interfaces for player and props
+interface Player {
+  number: number;
+  firstName: string;
+  lastName: string;
+  grade?: string;
+  position: string;
+  scores: string;
+  yellowCard: boolean;
+  redCard: boolean;
+}
+
+interface Status {
+  [number: number]: boolean;
+}
+
+interface RosterProps {
+  teamName: string;
+  onTeamNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  score: number;
+  onScoreChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  players: Player[];
+  status: Status;
+  toggleStatus: (num: number) => void;
+  handlePlayerChange: (idx: number, field: keyof Player, value: any) => void;
+  handleRemovePlayer: (idx: number) => void;
+  handleAddPlayer: () => void;
+  handleImportCSV: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  activeCount: number;
+}
+
+const initialHomeRoster: Player[] = [
   { number: 1, firstName: 'Alice', lastName: 'Smith', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
   { number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
   { number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
@@ -26,7 +56,7 @@ const initialHomeRoster = [
   { number: 20, firstName: 'Tina', lastName: 'Clark', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
-const initialOpponentRoster = [
+const initialOpponentRoster: Player[] = [
   { number: 1, firstName: 'Aaron', lastName: 'King', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
   { number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
   { number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
@@ -49,10 +79,10 @@ const initialOpponentRoster = [
   { number: 20, firstName: 'Tom', lastName: 'Collins', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
-function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }) {
-  const spanRef = useRef(null);
-  const inputRef = useRef(null);
-  const [inputWidth, setInputWidth] = useState(20);
+function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  const spanRef = useRef<HTMLSpanElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputWidth, setInputWidth] = useState<number>(20);
 
   useEffect(() => {
     if (spanRef.current) {
@@ -78,20 +108,20 @@ function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }
           height: 0,
           overflow: 'hidden',
           whiteSpace: 'pre',
-          fontSize: style.fontSize || 'inherit',
-          fontFamily: style.fontFamily || 'inherit',
-          fontWeight: style.fontWeight || 'inherit',
-          padding: style.padding || '2px 4px',
-          border: style.border || 'none',
+          fontSize: (style as React.CSSProperties).fontSize || 'inherit',
+          fontFamily: (style as React.CSSProperties).fontFamily || 'inherit',
+          fontWeight: (style as React.CSSProperties).fontWeight || 'inherit',
+          padding: (style as React.CSSProperties).padding || '2px 4px',
+          border: (style as React.CSSProperties).border || 'none',
         }}
       >{value || ''}</span>
     </>
   );
 }
 
-function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, activeCount }) {
+function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, activeCount }: RosterProps) {
   // Card toggle handlers
-  const handleToggleCard = (idx, cardType) => {
+  const handleToggleCard = (idx: number, cardType: keyof Player) => {
     handlePlayerChange(idx, cardType, !players[idx][cardType]);
   };
 
@@ -141,7 +171,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
               className={status[player.number] ? 'player-active' : 'player-inactive'}
               style={{ cursor: 'pointer' }}
               onClick={e => {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleStatus(player.number);
+                if ((e.target as HTMLElement).tagName !== 'INPUT' && (e.target as HTMLElement).tagName !== 'BUTTON') toggleStatus(player.number);
               }}
             >
               <td style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>&nbsp;&nbsp;
@@ -237,7 +267,7 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
   );
 }
 
-function getLocalStorage(key, fallback) {
+function getLocalStorage<T>(key: string, fallback: T): T {
   try {
     const value = localStorage.getItem(key);
     return value ? JSON.parse(value) : fallback;
@@ -246,7 +276,7 @@ function getLocalStorage(key, fallback) {
   }
 }
 
-function setLocalStorage(key, value) {
+function setLocalStorage(key: string, value: any) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {}
@@ -254,14 +284,14 @@ function setLocalStorage(key, value) {
 
 function App() {
   // Load from localStorage or fallback to initial values
-  const [homeStatus, setHomeStatus] = useState(() => getLocalStorage('homeStatus', {}));
-  const [opponentStatus, setOpponentStatus] = useState(() => getLocalStorage('opponentStatus', {}));
-  const [homeRoster, setHomeRoster] = useState(() => getLocalStorage('homeRoster', initialHomeRoster));
-  const [opponentRoster, setOpponentRoster] = useState(() => getLocalStorage('opponentRoster', initialOpponentRoster));
-  const [homeTeamName, setHomeTeamName] = useState(() => getLocalStorage('homeTeamName', 'Home Team'));
-  const [opponentTeamName, setOpponentTeamName] = useState(() => getLocalStorage('opponentTeamName', 'Opponent'));
-  const [homeScore, setHomeScore] = useState(() => getLocalStorage('homeScore', 0));
-  const [opponentScore, setOpponentScore] = useState(() => getLocalStorage('opponentScore', 0));
+  const [homeStatus, setHomeStatus] = useState<Status>(() => getLocalStorage<Status>('homeStatus', {}));
+  const [opponentStatus, setOpponentStatus] = useState<Status>(() => getLocalStorage<Status>('opponentStatus', {}));
+  const [homeRoster, setHomeRoster] = useState<Player[]>(() => getLocalStorage<Player[]>('homeRoster', initialHomeRoster));
+  const [opponentRoster, setOpponentRoster] = useState<Player[]>(() => getLocalStorage<Player[]>('opponentRoster', initialOpponentRoster));
+  const [homeTeamName, setHomeTeamName] = useState<string>(() => getLocalStorage<string>('homeTeamName', 'Home Team'));
+  const [opponentTeamName, setOpponentTeamName] = useState<string>(() => getLocalStorage<string>('opponentTeamName', 'Opponent'));
+  const [homeScore, setHomeScore] = useState<number>(() => getLocalStorage<number>('homeScore', 0));
+  const [opponentScore, setOpponentScore] = useState<number>(() => getLocalStorage<number>('opponentScore', 0));
 
   // Persist changes to localStorage
   useEffect(() => { setLocalStorage('homeRoster', homeRoster); }, [homeRoster]);
@@ -273,33 +303,43 @@ function App() {
   useEffect(() => { setLocalStorage('homeStatus', homeStatus); }, [homeStatus]);
   useEffect(() => { setLocalStorage('opponentStatus', opponentStatus); }, [opponentStatus]);
 
-  const toggleHomeStatus = (num) => {
+  const toggleHomeStatus = (num: number) => {
     setHomeStatus(prev => ({ ...prev, [num]: !prev[num] }));
   };
-  const toggleOpponentStatus = (num) => {
+  const toggleOpponentStatus = (num: number) => {
     setOpponentStatus(prev => ({ ...prev, [num]: !prev[num] }));
   };
 
   // Generalized player change handler
-  const handleHomePlayerChange = (idx, field, value) => {
+  const handleHomePlayerChange = (idx: number, field: keyof Player, value: any) => {
     setHomeRoster(prev => {
       const updated = [...prev];
-      updated[idx] = { ...updated[idx], [field]: field === 'number' ? Number(value) : value };
+      if (field === 'number') {
+        const num = Number(value);
+        updated[idx] = { ...updated[idx], number: isNaN(num) || value === '' ? updated[idx].number : num };
+      } else {
+        updated[idx] = { ...updated[idx], [field]: value };
+      }
       return updated;
     });
   };
-  const handleOpponentPlayerChange = (idx, field, value) => {
+  const handleOpponentPlayerChange = (idx: number, field: keyof Player, value: any) => {
     setOpponentRoster(prev => {
       const updated = [...prev];
-      updated[idx] = { ...updated[idx], [field]: field === 'number' ? Number(value) : value };
-      updated[idx] = { ...updated[idx], scores: value };
+      if (field === 'number') {
+        const num = Number(value);
+        updated[idx] = { ...updated[idx], number: isNaN(num) || value === '' ? updated[idx].number : num };
+      } else {
+        updated[idx] = { ...updated[idx], [field]: value };
+      }
+      return updated;
     });
   };
   // Remove player
-  const handleRemoveHomePlayer = (idx) => {
+  const handleRemoveHomePlayer = (idx: number) => {
     setHomeRoster(prev => prev.filter((_, i) => i !== idx));
   };
-  const handleRemoveOpponentPlayer = (idx) => {
+  const handleRemoveOpponentPlayer = (idx: number) => {
     setOpponentRoster(prev => prev.filter((_, i) => i !== idx));
   };
   // Add player
@@ -316,15 +356,15 @@ function App() {
     });
   };
   // Unified CSV import handler
-  const handleImportCSV = (setRoster) => (e) => {
-    const file = e.target.files[0];
+  const handleImportCSV = (setRoster: React.Dispatch<React.SetStateAction<Player[]>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: (results) => {
+      complete: (results: Papa.ParseResult<any>) => {
         try {
-          const imported = results.data.map(row => ({
+          const imported: Player[] = results.data.map((row: any) => ({
             number: Number(row.number),
             firstName: row.firstName || '',
             lastName: row.lastName || '',
@@ -338,12 +378,12 @@ function App() {
             setRoster(imported);
           } else {
             // Find which columns are missing
-            const missingColumns = [];
-            if (!results.meta.fields.includes('number')) missingColumns.push('number');
-            if (!results.meta.fields.includes('firstName')) missingColumns.push('firstName');
-            if (!results.meta.fields.includes('lastName')) missingColumns.push('lastName');
-            if (!results.meta.fields.includes('grade')) missingColumns.push('grade');
-            if (!results.meta.fields.includes('position')) missingColumns.push('position');
+            const missingColumns: string[] = [];
+            if (!results.meta.fields?.includes('number')) missingColumns.push('number');
+            if (!results.meta.fields?.includes('firstName')) missingColumns.push('firstName');
+            if (!results.meta.fields?.includes('lastName')) missingColumns.push('lastName');
+            if (!results.meta.fields?.includes('grade')) missingColumns.push('grade');
+            if (!results.meta.fields?.includes('position')) missingColumns.push('position');
             // Show a more helpful error message
             alert('Invalid CSV format. Missing columns: ' + (missingColumns.length ? missingColumns.join(', ') : 'Check for empty values in required columns.'));
           }
