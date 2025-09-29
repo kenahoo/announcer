@@ -89,7 +89,7 @@ function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }
   );
 }
 
-function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV }) {
+function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, activeCount }) {
   // Card toggle handlers
   const handleToggleCard = (idx, cardType) => {
     handlePlayerChange(idx, cardType, !players[idx][cardType]);
@@ -221,7 +221,10 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
           ))}
         </tbody>
       </table>
-      <div style={{ textAlign: 'right', marginTop: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+        <span style={{ fontSize: '0.95em', color: '#222', fontWeight: 500 }}>
+          Active players: {activeCount}
+        </span>
         <button
           type="button"
           onClick={handleAddPlayer}
@@ -352,6 +355,10 @@ function App() {
     e.target.value = '';
   };
 
+  // Calculate active player counts
+  const homeActiveCount = homeRoster.filter(p => homeStatus[p.number]).length;
+  const opponentActiveCount = opponentRoster.filter(p => opponentStatus[p.number]).length;
+
   return (
     <div className="App" style={{ display: 'flex', justifyContent: 'space-around', padding: '32px' }}>
       <Roster
@@ -366,6 +373,7 @@ function App() {
         handleRemovePlayer={handleRemoveHomePlayer}
         handleAddPlayer={handleAddHomePlayer}
         handleImportCSV={handleImportCSV(setHomeRoster)}
+        activeCount={homeActiveCount}
       />
       <Roster
         teamName={opponentTeamName}
@@ -379,6 +387,7 @@ function App() {
         handleRemovePlayer={handleRemoveOpponentPlayer}
         handleAddPlayer={handleAddOpponentPlayer}
         handleImportCSV={handleImportCSV(setOpponentRoster)}
+        activeCount={opponentActiveCount}
       />
     </div>
   );
