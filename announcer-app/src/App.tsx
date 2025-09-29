@@ -41,22 +41,6 @@ const initialHomeRoster: Player[] = [
   { number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
   { number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
   { number: 4, firstName: 'Dana', lastName: 'Brown', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 5, firstName: 'Eva', lastName: 'Jones', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 6, firstName: 'Fay', lastName: 'Miller', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 7, firstName: 'Gina', lastName: 'Wilson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 8, firstName: 'Holly', lastName: 'Moore', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 9, firstName: 'Ivy', lastName: 'Taylor', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 10, firstName: 'Jade', lastName: 'Anderson', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 11, firstName: 'Kate', lastName: 'Thomas', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 12, firstName: 'Lara', lastName: 'Jackson', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 13, firstName: 'Mia', lastName: 'White', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 14, firstName: 'Nina', lastName: 'Harris', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 15, firstName: 'Olga', lastName: 'Martin', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 16, firstName: 'Paula', lastName: 'Thompson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 17, firstName: 'Quinn', lastName: 'Garcia', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 18, firstName: 'Rita', lastName: 'Martinez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 19, firstName: 'Sara', lastName: 'Robinson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 20, firstName: 'Tina', lastName: 'Clark', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
 const initialOpponentRoster: Player[] = [
@@ -64,22 +48,6 @@ const initialOpponentRoster: Player[] = [
   { number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
   { number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
   { number: 4, firstName: 'Dylan', lastName: 'Hill', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 5, firstName: 'Eli', lastName: 'Scott', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 6, firstName: 'Finn', lastName: 'Green', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 7, firstName: 'Gabe', lastName: 'Adams', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 8, firstName: 'Henry', lastName: 'Nelson', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 9, firstName: 'Isaac', lastName: 'Baker', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 10, firstName: 'Jack', lastName: 'Carter', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 11, firstName: 'Kyle', lastName: 'Mitchell', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 12, firstName: 'Liam', lastName: 'Perez', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 13, firstName: 'Mason', lastName: 'Roberts', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 14, firstName: 'Noah', lastName: 'Turner', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 15, firstName: 'Owen', lastName: 'Phillips', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 16, firstName: 'Paul', lastName: 'Campbell', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 17, firstName: 'Quentin', lastName: 'Parker', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false },
-  { number: 18, firstName: 'Ryan', lastName: 'Evans', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 19, firstName: 'Sam', lastName: 'Edwards', grade: '', position: 'MF', scores: '', yellowCard: false, redCard: false },
-  { number: 20, firstName: 'Tom', lastName: 'Collins', grade: '', position: 'FW', scores: '', yellowCard: false, redCard: false }
 ];
 
 function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
