@@ -270,6 +270,47 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
   );
 }
 
+function importPlayersFromCSV(file: File, onSuccess: (players: Player[]) => void, onError: (msg: string) => void) {
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (results: Papa.ParseResult<any>) => {
+      try {
+        const requiredFields = ['number', 'firstName', 'lastName'];
+        const missingColumns = requiredFields.filter(f => !results.meta.fields?.includes(f));
+        if (missingColumns.length) {
+          onError('Invalid CSV format. Missing columns: ' + missingColumns.join(', '));
+          return;
+        }
+        const players: Player[] = [];
+        for (let i = 0; i < results.data.length; i++) {
+          const row = results.data[i];
+          if (
+            row.number === undefined || row.number === '' || isNaN(Number(row.number)) ||
+            !row.firstName || !row.lastName
+          ) {
+            onError(`Invalid data in row ${i + 2}: Each player must have a valid number, firstName, and lastName.`);
+            return;
+          }
+          players.push({
+            number: Number(row.number),
+            firstName: row.firstName,
+            lastName: row.lastName,
+            grade: row.grade || '',
+            position: row.position || '',
+            scores: row.scores || '',
+            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
+            redCard: row.redCard === 'true' || row.redCard === '1',
+          });
+        }
+        onSuccess(players);
+      } catch {
+        onError('Failed to import CSV.');
+      }
+    }
+  });
+}
+
 function getLocalStorage<T>(key: string, fallback: T): T {
   try {
     const value = localStorage.getItem(key);
@@ -334,39 +375,11 @@ function App() {
   const handleImportCSV = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results: Papa.ParseResult<any>) => {
-        try {
-          const imported: Player[] = results.data.map((row: any) => ({
-            number: Number(row.number),
-            firstName: row.firstName || '',
-            lastName: row.lastName || '',
-            grade: row.grade || '',
-            position: row.position || '',
-            scores: row.scores || '',
-            yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
-            redCard: row.redCard === 'true' || row.redCard === '1',
-          }));
-          if (imported.every(p => typeof p.number === 'number' && p.firstName && p.lastName)) {
-            setRoster(imported);
-          } else {
-            // Find which columns are missing
-            const missingColumns: string[] = [];
-            if (!results.meta.fields?.includes('number')) missingColumns.push('number');
-            if (!results.meta.fields?.includes('firstName')) missingColumns.push('firstName');
-            if (!results.meta.fields?.includes('lastName')) missingColumns.push('lastName');
-            if (!results.meta.fields?.includes('grade')) missingColumns.push('grade');
-            if (!results.meta.fields?.includes('position')) missingColumns.push('position');
-            // Show a more helpful error message
-            alert('Invalid CSV format. Missing columns: ' + (missingColumns.length ? missingColumns.join(', ') : 'Check for empty values in required columns.'));
-          }
-        } catch {
-          alert('Failed to import CSV.');
-        }
-      }
-    });
+    importPlayersFromCSV(
+      file,
+      (imported) => setTeam(prev => ({ ...prev, roster: imported })),
+      (msg) => alert(msg)
+    );
     e.target.value = '';
   };
   const toggleStatus = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (num: number) => {
