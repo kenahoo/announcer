@@ -18,18 +18,21 @@ interface Status {
   [number: number]: boolean;
 }
 
-interface RosterProps {
-  teamName: string;
-  onTeamNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  score: number;
-  onScoreChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  players: Player[];
+interface TeamState {
+  roster: Player[];
   status: Status;
-  toggleStatus: (num: number) => void;
+  name: string;
+  score: number;
+}
+
+interface RosterProps {
+  team: TeamState;
+  setTeam: React.Dispatch<React.SetStateAction<TeamState>>;
   handlePlayerChange: (idx: number, field: keyof Player, value: any) => void;
   handleRemovePlayer: (idx: number) => void;
   handleAddPlayer: () => void;
   handleImportCSV: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  toggleStatus: (num: number) => void;
   activeCount: number;
 }
 
@@ -119,10 +122,10 @@ function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }
   );
 }
 
-function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, status, toggleStatus, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, activeCount }: RosterProps) {
+function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, toggleStatus, activeCount }: RosterProps) {
   // Card toggle handlers
   const handleToggleCard = (idx: number, cardType: keyof Player) => {
-    handlePlayerChange(idx, cardType, !players[idx][cardType]);
+    handlePlayerChange(idx, cardType, !team.roster[idx][cardType]);
   };
 
   return (
@@ -136,16 +139,16 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
       <div className="team-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', gap: '32px' }}>
         <input
           type="text"
-          value={teamName}
-          onChange={onTeamNameChange}
+          value={team.name}
+          onChange={e => setTeam(prev => ({ ...prev, name: e.target.value }))}
           className="team-name-input"
           style={{ fontSize: '1.5em', fontWeight: 'bold', textAlign: 'center', flex: 1, minWidth: '120px', border: 'none', background: 'transparent', color: '#222' }}
           placeholder="Team Name"
         />
         <input
           type="number"
-          value={score}
-          onChange={onScoreChange}
+          value={team.score}
+          onChange={e => setTeam(prev => ({ ...prev, score: Number(e.target.value) }))}
           className="team-score-input"
           min={0}
           style={{ fontSize: '2.5em', fontWeight: 'bold', width: '110px', textAlign: 'center', borderRadius: '8px', border: '2px solid #888', background: '#fff', color: '#222', margin: '0 16px' }}
@@ -165,10 +168,10 @@ function Roster({ teamName, onTeamNameChange, score, onScoreChange, players, sta
           </tr>
         </thead>
         <tbody>
-          {players.sort((a, b) => a.number - b.number).map((player, idx) => (
+          {team.roster.sort((a, b) => a.number - b.number).map((player, idx) => (
             <tr
               key={player.number}
-              className={status[player.number] ? 'player-active' : 'player-inactive'}
+              className={team.status[player.number] ? 'player-active' : 'player-inactive'}
               style={{ cursor: 'pointer' }}
               onClick={e => {
                 if ((e.target as HTMLElement).tagName !== 'INPUT' && (e.target as HTMLElement).tagName !== 'BUTTON') toggleStatus(player.number);
@@ -284,79 +287,51 @@ function setLocalStorage(key: string, value: any) {
 
 function App() {
   // Load from localStorage or fallback to initial values
-  const [homeStatus, setHomeStatus] = useState<Status>(() => getLocalStorage<Status>('homeStatus', {}));
-  const [opponentStatus, setOpponentStatus] = useState<Status>(() => getLocalStorage<Status>('opponentStatus', {}));
-  const [homeRoster, setHomeRoster] = useState<Player[]>(() => getLocalStorage<Player[]>('homeRoster', initialHomeRoster));
-  const [opponentRoster, setOpponentRoster] = useState<Player[]>(() => getLocalStorage<Player[]>('opponentRoster', initialOpponentRoster));
-  const [homeTeamName, setHomeTeamName] = useState<string>(() => getLocalStorage<string>('homeTeamName', 'Home Team'));
-  const [opponentTeamName, setOpponentTeamName] = useState<string>(() => getLocalStorage<string>('opponentTeamName', 'Opponent'));
-  const [homeScore, setHomeScore] = useState<number>(() => getLocalStorage<number>('homeScore', 0));
-  const [opponentScore, setOpponentScore] = useState<number>(() => getLocalStorage<number>('opponentScore', 0));
+  const [homeTeam, setHomeTeam] = useState<TeamState>(() => ({
+    roster: getLocalStorage<Player[]>('homeRoster', initialHomeRoster),
+    status: getLocalStorage<Status>('homeStatus', {}),
+    name: getLocalStorage<string>('homeName', 'Home Team'),
+    score: getLocalStorage<number>('homeScore', 0),
+  }));
+  const [opponentTeam, setOpponentTeam] = useState<TeamState>(() => ({
+    roster: getLocalStorage<Player[]>('opponentRoster', initialOpponentRoster),
+    status: getLocalStorage<Status>('opponentStatus', {}),
+    name: getLocalStorage<string>('opponentName', 'Opponent'),
+    score: getLocalStorage<number>('opponentScore', 0),
+  }));
 
   // Persist changes to localStorage
-  useEffect(() => { setLocalStorage('homeRoster', homeRoster); }, [homeRoster]);
-  useEffect(() => { setLocalStorage('opponentRoster', opponentRoster); }, [opponentRoster]);
-  useEffect(() => { setLocalStorage('homeTeamName', homeTeamName); }, [homeTeamName]);
-  useEffect(() => { setLocalStorage('opponentTeamName', opponentTeamName); }, [opponentTeamName]);
-  useEffect(() => { setLocalStorage('homeScore', homeScore); }, [homeScore]);
-  useEffect(() => { setLocalStorage('opponentScore', opponentScore); }, [opponentScore]);
-  useEffect(() => { setLocalStorage('homeStatus', homeStatus); }, [homeStatus]);
-  useEffect(() => { setLocalStorage('opponentStatus', opponentStatus); }, [opponentStatus]);
+  useEffect(() => { setLocalStorage('homeRoster', homeTeam.roster); }, [homeTeam.roster]);
+  useEffect(() => { setLocalStorage('homeStatus', homeTeam.status); }, [homeTeam.status]);
+  useEffect(() => { setLocalStorage('homeName', homeTeam.name); }, [homeTeam.name]);
+  useEffect(() => { setLocalStorage('homeScore', homeTeam.score); }, [homeTeam.score]);
+  useEffect(() => { setLocalStorage('opponentRoster', opponentTeam.roster); }, [opponentTeam.roster]);
+  useEffect(() => { setLocalStorage('opponentStatus', opponentTeam.status); }, [opponentTeam.status]);
+  useEffect(() => { setLocalStorage('opponentName', opponentTeam.name); }, [opponentTeam.name]);
+  useEffect(() => { setLocalStorage('opponentScore', opponentTeam.score); }, [opponentTeam.score]);
 
-  const toggleHomeStatus = (num: number) => {
-    setHomeStatus(prev => ({ ...prev, [num]: !prev[num] }));
-  };
-  const toggleOpponentStatus = (num: number) => {
-    setOpponentStatus(prev => ({ ...prev, [num]: !prev[num] }));
-  };
-
-  // Generalized player change handler
-  const handleHomePlayerChange = (idx: number, field: keyof Player, value: any) => {
-    setHomeRoster(prev => {
-      const updated = [...prev];
+  const handlePlayerChange = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (idx: number, field: keyof Player, value: any) => {
+    setTeam(prev => {
+      const updated = [...prev.roster];
       if (field === 'number') {
         const num = Number(value);
         updated[idx] = { ...updated[idx], number: isNaN(num) || value === '' ? updated[idx].number : num };
       } else {
         updated[idx] = { ...updated[idx], [field]: value };
       }
-      return updated;
+      return { ...prev, roster: updated };
     });
   };
-  const handleOpponentPlayerChange = (idx: number, field: keyof Player, value: any) => {
-    setOpponentRoster(prev => {
-      const updated = [...prev];
-      if (field === 'number') {
-        const num = Number(value);
-        updated[idx] = { ...updated[idx], number: isNaN(num) || value === '' ? updated[idx].number : num };
-      } else {
-        updated[idx] = { ...updated[idx], [field]: value };
-      }
-      return updated;
+  const handleRemovePlayer = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (idx: number) => {
+    setTeam(prev => ({ ...prev, roster: prev.roster.filter((_, i) => i !== idx) }));
+  };
+  const handleAddPlayer = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => () => {
+    setTeam(prev => {
+      const nextNumber = prev.roster.length > 0 ? Math.max(...prev.roster.map(p => p.number)) + 1 : 1;
+      return { ...prev, roster: [...prev.roster, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false }] };
     });
   };
-  // Remove player
-  const handleRemoveHomePlayer = (idx: number) => {
-    setHomeRoster(prev => prev.filter((_, i) => i !== idx));
-  };
-  const handleRemoveOpponentPlayer = (idx: number) => {
-    setOpponentRoster(prev => prev.filter((_, i) => i !== idx));
-  };
-  // Add player
-  const handleAddHomePlayer = () => {
-    setHomeRoster(prev => {
-      const nextNumber = prev.length > 0 ? Math.max(...prev.map(p => p.number)) + 1 : 1;
-      return [...prev, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false }];
-    });
-  };
-  const handleAddOpponentPlayer = () => {
-    setOpponentRoster(prev => {
-      const nextNumber = prev.length > 0 ? Math.max(...prev.map(p => p.number)) + 1 : 1;
-      return [...prev, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false }];
-    });
-  };
-  // Unified CSV import handler
-  const handleImportCSV = (setRoster: React.Dispatch<React.SetStateAction<Player[]>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportCSV = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     Papa.parse(file, {
@@ -394,39 +369,34 @@ function App() {
     });
     e.target.value = '';
   };
+  const toggleStatus = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (num: number) => {
+    setTeam(prev => ({ ...prev, status: { ...prev.status, [num]: !prev.status[num] } }));
+  };
 
   // Calculate active player counts
-  const homeActiveCount = homeRoster.filter(p => homeStatus[p.number]).length;
-  const opponentActiveCount = opponentRoster.filter(p => opponentStatus[p.number]).length;
+  const homeActiveCount = homeTeam.roster.filter(p => homeTeam.status[p.number]).length;
+  const opponentActiveCount = opponentTeam.roster.filter(p => opponentTeam.status[p.number]).length;
 
   return (
     <div className="App" style={{ display: 'flex', justifyContent: 'space-around', padding: '32px' }}>
       <Roster
-        teamName={homeTeamName}
-        onTeamNameChange={e => setHomeTeamName(e.target.value)}
-        score={homeScore}
-        onScoreChange={e => setHomeScore(Number(e.target.value))}
-        players={homeRoster}
-        status={homeStatus}
-        toggleStatus={toggleHomeStatus}
-        handlePlayerChange={handleHomePlayerChange}
-        handleRemovePlayer={handleRemoveHomePlayer}
-        handleAddPlayer={handleAddHomePlayer}
-        handleImportCSV={handleImportCSV(setHomeRoster)}
+        team={homeTeam}
+        setTeam={setHomeTeam}
+        handlePlayerChange={handlePlayerChange(setHomeTeam)}
+        handleRemovePlayer={handleRemovePlayer(setHomeTeam)}
+        handleAddPlayer={handleAddPlayer(setHomeTeam)}
+        handleImportCSV={handleImportCSV(setHomeTeam)}
+        toggleStatus={toggleStatus(setHomeTeam)}
         activeCount={homeActiveCount}
       />
       <Roster
-        teamName={opponentTeamName}
-        onTeamNameChange={e => setOpponentTeamName(e.target.value)}
-        score={opponentScore}
-        onScoreChange={e => setOpponentScore(Number(e.target.value))}
-        players={opponentRoster}
-        status={opponentStatus}
-        toggleStatus={toggleOpponentStatus}
-        handlePlayerChange={handleOpponentPlayerChange}
-        handleRemovePlayer={handleRemoveOpponentPlayer}
-        handleAddPlayer={handleAddOpponentPlayer}
-        handleImportCSV={handleImportCSV(setOpponentRoster)}
+        team={opponentTeam}
+        setTeam={setOpponentTeam}
+        handlePlayerChange={handlePlayerChange(setOpponentTeam)}
+        handleRemovePlayer={handleRemovePlayer(setOpponentTeam)}
+        handleAddPlayer={handleAddPlayer(setOpponentTeam)}
+        handleImportCSV={handleImportCSV(setOpponentTeam)}
+        toggleStatus={toggleStatus(setOpponentTeam)}
         activeCount={opponentActiveCount}
       />
     </div>
