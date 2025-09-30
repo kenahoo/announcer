@@ -27,6 +27,7 @@ interface TeamState {
 }
 
 interface RosterProps {
+  id: string;
   team: TeamState;
   setTeam: React.Dispatch<React.SetStateAction<TeamState>>;
   handlePlayerChange: (idx: number, field: keyof Player, value: any) => void;
@@ -91,7 +92,7 @@ function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }
   );
 }
 
-function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, toggleStatus, activeCount }: RosterProps) {
+function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, toggleStatus, activeCount, id }: RosterProps) {
   // Card toggle handlers
   const handleToggleCard = (idx: number, cardType: string) => {
     handlePlayerChange(idx, cardType, !team.roster[idx][cardType]);
@@ -226,11 +227,11 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
             type="file"
             accept=".csv,text/csv"
             style={{ display: 'none' }}
-            id="csv-import-input"
+            id={id}
             onChange={handleImportCSV}
           />
           <button
-            onClick={() => document.getElementById('csv-import-input')?.click()}
+            onClick={() => document.getElementById(id)?.click()}
             style={{ cursor: 'pointer'}}
           >
             Import CSV
@@ -399,6 +400,7 @@ function App() {
         handleImportCSV={handleImportCSV(setHomeTeam)}
         toggleStatus={toggleStatus(setHomeTeam)}
         activeCount={homeActiveCount}
+        id="team-home"
       />
       <Roster
         team={opponentTeam}
@@ -409,6 +411,7 @@ function App() {
         handleImportCSV={handleImportCSV(setOpponentTeam)}
         toggleStatus={toggleStatus(setOpponentTeam)}
         activeCount={opponentActiveCount}
+        id="team-opponent"
       />
     </div>
   );
