@@ -93,8 +93,10 @@ function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }
 
 function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, toggleStatus, activeCount, id }: RosterProps) {
   // Card toggle handlers
-  const handleToggleCard = (idx: number, cardType: string) => {
-    handlePlayerChange(idx, cardType, !team.roster[idx][cardType]);
+  const handleToggleCard = (idx: number, cardType: 'yellowCard' | 'redCard') => {
+    const player = team.roster[idx];
+    if (!player) return;
+    handlePlayerChange(idx, cardType, !player[cardType]);
   };
 
   return (
@@ -329,6 +331,7 @@ function App() {
   const handlePlayerChange = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (idx: number, field: keyof Player, value: any) => {
     setTeam(prev => {
       const updated = [...prev.roster];
+      if (!updated[idx]) return prev;
       if (field === 'number') {
         const num = Number(value);
         value = isNaN(num) || value === '' ? updated[idx].number : num;
