@@ -124,11 +124,11 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
         <thead>
           <tr>
             <th></th>
-            <th>Number</th>
+            <th style={{ textAlign: 'right' }}>#</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Grade</th>
-            <th>Notes</th>
+            <th style={{ textAlign: 'right' }}>Grade</th>
+            <th style={{ textAlign: 'center' }}>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -165,12 +165,13 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
                 >
                 </button>
               </td>
-              <td>
+              <td style={{ textAlign: 'right' }}>
                 <AutoWidthInput
                   type="number"
                   value={player.number}
                   onChange={e => handlePlayerChange(idx, 'number', e.target.value)}
-                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
+                  className="no-spinner"
+                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'right' }}
                 />
               </td>
               <td>
@@ -189,12 +190,12 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
                   style={{ width: '100%', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px' }}
                 />
               </td>
-              <td>
+              <td style={{ textAlign: 'right' }}>
                 <AutoWidthInput
                   type="text"
                   value={player.grade || ''}
                   onChange={e => handlePlayerChange(idx, 'grade', e.target.value)}
-                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
+                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'right' }}
                 />
               </td>
               <td>
