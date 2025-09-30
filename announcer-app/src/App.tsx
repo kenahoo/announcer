@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 
 // TypeScript interfaces for player and props
 interface Player {
+  id: string; // internal unique identifier
   number: number;
   firstName: string;
   lastName: string;
@@ -15,7 +16,7 @@ interface Player {
 }
 
 interface Status {
-  [number: number]: boolean;
+  [id: string]: boolean;
 }
 
 interface TeamState {
@@ -29,25 +30,25 @@ interface RosterProps {
   team: TeamState;
   setTeam: React.Dispatch<React.SetStateAction<TeamState>>;
   handlePlayerChange: (idx: number, field: keyof Player, value: any) => void;
-  handleRemovePlayer: (idx: number) => void;
+  handleRemovePlayer: (id: string) => void;
   handleAddPlayer: () => void;
   handleImportCSV: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  toggleStatus: (num: number) => void;
+  toggleStatus: (id: string) => void;
   activeCount: number;
 }
 
 const initialHomeRoster: Player[] = [
-  { number: 1, firstName: 'Alice', lastName: 'Smith', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
-  { number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 4, firstName: 'Dana', lastName: 'Brown', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 1, firstName: 'Alice', lastName: 'Smith', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 4, firstName: 'Dana', lastName: 'Brown', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
 ];
 
 const initialOpponentRoster: Player[] = [
-  { number: 1, firstName: 'Aaron', lastName: 'King', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
-  { number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { number: 4, firstName: 'Dylan', lastName: 'Hill', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 1, firstName: 'Aaron', lastName: 'King', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 4, firstName: 'Dylan', lastName: 'Hill', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
 ];
 
 function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
@@ -92,7 +93,7 @@ function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }
 
 function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleAddPlayer, handleImportCSV, toggleStatus, activeCount }: RosterProps) {
   // Card toggle handlers
-  const handleToggleCard = (idx: number, cardType: keyof Player) => {
+  const handleToggleCard = (idx: number, cardType: string) => {
     handlePlayerChange(idx, cardType, !team.roster[idx][cardType]);
   };
 
@@ -132,17 +133,17 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
         <tbody>
           {team.roster.sort((a, b) => a.number - b.number).map((player, idx) => (
             <tr
-              key={player.number}
-              className={team.status[player.number] ? 'player-active' : 'player-inactive'}
+              key={player.id}
+              className={team.status[player.id] ? 'player-active' : 'player-inactive'}
               style={{ cursor: 'pointer' }}
               onClick={e => {
-                if ((e.target as HTMLElement).tagName !== 'INPUT' && (e.target as HTMLElement).tagName !== 'BUTTON') toggleStatus(player.number);
+                if ((e.target as HTMLElement).tagName !== 'INPUT' && (e.target as HTMLElement).tagName !== 'BUTTON') toggleStatus(player.id);
               }}
             >
               <td style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>&nbsp;&nbsp;
                 <button
                   type="button"
-                  onClick={e => { e.stopPropagation(); handleRemovePlayer(idx); }}
+                  onClick={e => { e.stopPropagation(); handleRemovePlayer(player.id); }}
                   style={{ background: 'transparent', color: '#fff', border: '1px solid #000', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold', marginLeft: '4px' }}
                   aria-label="Remove Player"
                 >×</button>
@@ -246,6 +247,13 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
   );
 }
 
+// Helper to generate a unique id
+function generatePlayerId() {
+  return (
+    Date.now().toString(36) + Math.random().toString(36).substring(2, 9)
+  );
+}
+
 function importPlayersFromCSV(file: File, onSuccess: (players: Player[]) => void, onError: (msg: string) => void) {
   Papa.parse(file, {
     header: true,
@@ -269,6 +277,7 @@ function importPlayersFromCSV(file: File, onSuccess: (players: Player[]) => void
             return;
           }
           players.push({
+            id: generatePlayerId(),
             number: Number(row.number),
             firstName: row.firstName,
             lastName: row.lastName,
@@ -332,20 +341,28 @@ function App() {
       const updated = [...prev.roster];
       if (field === 'number') {
         const num = Number(value);
-        updated[idx] = { ...updated[idx], number: isNaN(num) || value === '' ? updated[idx].number : num };
-      } else {
-        updated[idx] = { ...updated[idx], [field]: value };
+        value = isNaN(num) || value === '' ? updated[idx].number : num;
       }
+      updated[idx] = { ...updated[idx], [field]: value };
       return { ...prev, roster: updated };
     });
   };
-  const handleRemovePlayer = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (idx: number) => {
-    setTeam(prev => ({ ...prev, roster: prev.roster.filter((_, i) => i !== idx) }));
+  const handleRemovePlayer = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (id: string) => {
+    setTeam(prev => {
+      const newRoster = prev.roster.filter(p => p.id !== id);
+      delete(prev.status[id]);
+      return { ...prev, roster: newRoster };
+    });
   };
   const handleAddPlayer = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => () => {
     setTeam(prev => {
       const nextNumber = prev.roster.length > 0 ? Math.max(...prev.roster.map(p => p.number)) + 1 : 1;
-      return { ...prev, roster: [...prev.roster, { number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false }] };
+      const newPlayer: Player = { id: generatePlayerId(), number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false };
+      return {
+        ...prev,
+        roster: [...prev.roster, newPlayer],
+        status: { ...prev.status, [newPlayer.id]: false }
+      };
     });
   };
   const handleImportCSV = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,18 +370,23 @@ function App() {
     if (!file) return;
     importPlayersFromCSV(
       file,
-      (imported) => setTeam(prev => ({ ...prev, roster: imported })),
+      (imported) => {
+        // Build a new status object for the imported players
+        const newStatus: Status = {};
+        imported.forEach(p => { newStatus[p.id] = false; });
+        setTeam(prev => ({ ...prev, roster: imported, status: newStatus }));
+      },
       (msg) => alert(msg)
     );
     e.target.value = '';
   };
-  const toggleStatus = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (num: number) => {
-    setTeam(prev => ({ ...prev, status: { ...prev.status, [num]: !prev.status[num] } }));
+  const toggleStatus = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => (id: string) => {
+    setTeam(prev => ({ ...prev, status: { ...prev.status, [id]: !prev.status[id] } }));
   };
 
   // Calculate active player counts
-  const homeActiveCount = homeTeam.roster.filter(p => homeTeam.status[p.number]).length;
-  const opponentActiveCount = opponentTeam.roster.filter(p => opponentTeam.status[p.number]).length;
+  const homeActiveCount = homeTeam.roster.filter(p => homeTeam.status[p.id]).length;
+  const opponentActiveCount = opponentTeam.roster.filter(p => opponentTeam.status[p.id]).length;
 
   return (
     <div className="App" style={{ display: 'flex', justifyContent: 'space-around', padding: '32px' }}>
