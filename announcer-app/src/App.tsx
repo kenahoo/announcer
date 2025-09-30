@@ -9,7 +9,6 @@ interface Player {
   firstName: string;
   lastName: string;
   grade?: string;
-  position: string;
   scores: string;
   yellowCard: boolean;
   redCard: boolean;
@@ -39,17 +38,17 @@ interface RosterProps {
 }
 
 const initialHomeRoster: Player[] = [
-  { id: generatePlayerId(), number: 1, firstName: 'Alice', lastName: 'Smith', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
-  { id: generatePlayerId(), number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { id: generatePlayerId(), number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { id: generatePlayerId(), number: 4, firstName: 'Dana', lastName: 'Brown', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 1, firstName: 'Alice', lastName: 'Smith', grade: '', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 2, firstName: 'Beth', lastName: 'Johnson', grade: '', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 3, firstName: 'Cara', lastName: 'Williams', grade: '', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 4, firstName: 'Dana', lastName: 'Brown', grade: '', scores: '', yellowCard: false, redCard: false },
 ];
 
 const initialOpponentRoster: Player[] = [
-  { id: generatePlayerId(), number: 1, firstName: 'Aaron', lastName: 'King', grade: '', position: 'GK', scores: '', yellowCard: false, redCard: false },
-  { id: generatePlayerId(), number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { id: generatePlayerId(), number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
-  { id: generatePlayerId(), number: 4, firstName: 'Dylan', lastName: 'Hill', grade: '', position: 'DF', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 1, firstName: 'Aaron', lastName: 'King', grade: '', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 2, firstName: 'Ben', lastName: 'Wright', grade: '', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 3, firstName: 'Caleb', lastName: 'Lopez', grade: '', scores: '', yellowCard: false, redCard: false },
+  { id: generatePlayerId(), number: 4, firstName: 'Dylan', lastName: 'Hill', grade: '', scores: '', yellowCard: false, redCard: false },
 ];
 
 function AutoWidthInput({ value, onChange, type = 'text', style = {}, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
@@ -127,7 +126,6 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
             <th>First Name</th>
             <th>Last Name</th>
             <th>Grade</th>
-            <th>Position</th>
             <th>Notes</th>
           </tr>
         </thead>
@@ -194,14 +192,6 @@ function Roster({ team, setTeam, handlePlayerChange, handleRemovePlayer, handleA
                   type="text"
                   value={player.grade || ''}
                   onChange={e => handlePlayerChange(idx, 'grade', e.target.value)}
-                  style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
-                />
-              </td>
-              <td>
-                <AutoWidthInput
-                  type="text"
-                  value={player.position}
-                  onChange={e => handlePlayerChange(idx, 'position', e.target.value)}
                   style={{ width: '60px', color: 'black', background: 'transparent', border: 'none', borderRadius: '0', padding: '2px 4px', textAlign: 'center' }}
                 />
               </td>
@@ -283,7 +273,6 @@ function importPlayersFromCSV(file: File, onSuccess: (players: Player[]) => void
             firstName: row.firstName,
             lastName: row.lastName,
             grade: row.grade || '',
-            position: row.position || '',
             scores: row.scores || '',
             yellowCard: row.yellowCard === 'true' || row.yellowCard === '1',
             redCard: row.redCard === 'true' || row.redCard === '1',
@@ -358,7 +347,7 @@ function App() {
   const handleAddPlayer = (setTeam: React.Dispatch<React.SetStateAction<TeamState>>) => () => {
     setTeam(prev => {
       const nextNumber = prev.roster.length > 0 ? Math.max(...prev.roster.map(p => p.number)) + 1 : 1;
-      const newPlayer: Player = { id: generatePlayerId(), number: nextNumber, firstName: '', lastName: '', position: '', scores: '', yellowCard: false, redCard: false };
+      const newPlayer: Player = { id: generatePlayerId(), number: nextNumber, firstName: '', lastName: '', scores: '', yellowCard: false, redCard: false };
       return {
         ...prev,
         roster: [...prev.roster, newPlayer],
